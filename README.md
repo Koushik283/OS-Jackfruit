@@ -114,7 +114,7 @@ dmesg | grep container_monitor | tail -5
 
 
 **Screenshot 4 — CLI command and supervisor response**
-<img width="1154" height="130" alt="screenshot4" src="https://github.com/user-attachments/assets/e8633ae1-3e4c-4426-9498-a252d88d8614" />
+<img width="1600" height="180" alt="WhatsApp Image 2026-04-17 at 10 47 29 PM" src="https://github.com/user-attachments/assets/1f28b9fa-13c2-47be-ab9c-2afc3a963990" />
 
 
 

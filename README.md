@@ -127,6 +127,7 @@ dmesg | grep container_monitor | tail -5
 
 
 **Screenshot 7 — Scheduler experiment results**
+
 **part - 1**
 <img width="1280" height="589" alt="screenshot7 1" src="https://github.com/user-attachments/assets/e85dc382-5131-41a6-8f0c-710b185200df" />
 

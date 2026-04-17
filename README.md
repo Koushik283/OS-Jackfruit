@@ -100,34 +100,42 @@ dmesg | grep container_monitor | tail -5
 
 **Screenshot 1 — Two containers running under one supervisor**
 
-<img width="1056" height="109" alt="image" src="https://github.com/user-attachments/assets/689658a8-4e40-455c-b487-9006e815b266" />
+<img width="1280" height="126" alt="image" src="https://github.com/user-attachments/assets/3c856421-4c23-4ad3-aa3b-20a2563def97" />
+
 
 **Screenshot 2 — ps output showing container metadata**
-<img width="734" height="87" alt="image" src="https://github.com/user-attachments/assets/433d1b85-4a11-4139-a09a-77d512c0d2e8" />
+
+<img width="1280" height="343" alt="screenshot2" src="https://github.com/user-attachments/assets/50b7988d-7558-4e62-998f-999d89f1aedb" />
 
 
 **Screenshot 3 — Logging pipeline proof**
-<img width="934" height="306" alt="image" src="https://github.com/user-attachments/assets/310a86a1-04e9-4d2a-a462-0221b3a7785c" />
+
+<img width="1280" height="800" alt="screenshot3" src="https://github.com/user-attachments/assets/e73a5b19-facf-41fb-a88f-55a095d36ef3" />
 
 
 **Screenshot 4 — CLI command and supervisor response**
-<img width="944" height="620" alt="image" src="https://github.com/user-attachments/assets/585c4598-791d-4fdf-a0bd-2e49e586d0c6" />
+<img width="1154" height="130" alt="screenshot4" src="https://github.com/user-attachments/assets/e8633ae1-3e4c-4426-9498-a252d88d8614" />
+
 
 
 **Screenshot 5 — Soft limit warning in dmesg**
-<img width="1189" height="328" alt="image" src="https://github.com/user-attachments/assets/5969211d-6693-4d93-92cf-38bfa1c308a9" />
+<img width="1280" height="202" alt="screenshot5" src="https://github.com/user-attachments/assets/57fe6ed6-40ff-47b0-8d80-1eada3a0baa2" />
 
 
 **Screenshot 6 — Hard limit kill in dmesg**
-<img width="1189" height="328" alt="image" src="https://github.com/user-attachments/assets/1b7d7c1b-ff16-40f3-b8c7-d3cb8aa79cfa" />
+<img width="1280" height="202" alt="screenshot6" src="https://github.com/user-attachments/assets/689e1d3a-cd68-4265-8aa8-9dd52bb66fc0" />
 
 
 **Screenshot 7 — Scheduler experiment results**
-<img width="886" height="546" alt="image" src="https://github.com/user-attachments/assets/8e30f2aa-da48-40c4-8687-8487f48a7083" />
+**part - 1**
+<img width="1280" height="589" alt="screenshot7 1" src="https://github.com/user-attachments/assets/e85dc382-5131-41a6-8f0c-710b185200df" />
 
+**part - 2**
+<img width="1280" height="401" alt="screenshot7 2" src="https://github.com/user-attachments/assets/52648142-97ff-4e49-ab26-09e2833bb0b9" />
 
 **Screenshot 8 — Clean teardown, no zombies**
-<img width="841" height="305" alt="image" src="https://github.com/user-attachments/assets/f0fd0da0-8ee0-4b5b-a7a7-c6c5a320d159" />
+<img width="1280" height="202" alt="screenshot8" src="https://github.com/user-attachments/assets/174ec949-0832-4fb3-84b4-ce5d75daf131" />
+
 
 ## 4. Engineering Analysis
 

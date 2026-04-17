@@ -103,14 +103,17 @@ dmesg | grep container_monitor | tail -5
 <img width="1280" height="126" alt="image" src="https://github.com/user-attachments/assets/3c856421-4c23-4ad3-aa3b-20a2563def97" />
 
 
+
 **Screenshot 2 — ps output showing container metadata**
 
 <img width="1280" height="343" alt="screenshot2" src="https://github.com/user-attachments/assets/50b7988d-7558-4e62-998f-999d89f1aedb" />
 
 
+
 **Screenshot 3 — Logging pipeline proof**
 
 <img width="1280" height="800" alt="screenshot3" src="https://github.com/user-attachments/assets/e73a5b19-facf-41fb-a88f-55a095d36ef3" />
+
 
 
 **Screenshot 4 — CLI command and supervisor response**
@@ -119,14 +122,17 @@ dmesg | grep container_monitor | tail -5
 
 
 
+
 **Screenshot 5 — Soft limit warning in dmesg**
 
 <img width="1280" height="202" alt="screenshot5" src="https://github.com/user-attachments/assets/57fe6ed6-40ff-47b0-8d80-1eada3a0baa2" />
 
 
+
 **Screenshot 6 — Hard limit kill in dmesg**
 
 <img width="1280" height="202" alt="screenshot6" src="https://github.com/user-attachments/assets/689e1d3a-cd68-4265-8aa8-9dd52bb66fc0" />
+
 
 
 **Screenshot 7 — Scheduler experiment results**
@@ -137,9 +143,11 @@ dmesg | grep container_monitor | tail -5
 **part - 2**
 <img width="1280" height="401" alt="screenshot7 2" src="https://github.com/user-attachments/assets/52648142-97ff-4e49-ab26-09e2833bb0b9" />
 
+
 **Screenshot 8 — Clean teardown, no zombies**
 
 <img width="1280" height="202" alt="screenshot8" src="https://github.com/user-attachments/assets/174ec949-0832-4fb3-84b4-ce5d75daf131" />
+
 
 
 ## 4. Engineering Analysis

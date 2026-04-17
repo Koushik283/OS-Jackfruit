@@ -114,15 +114,18 @@ dmesg | grep container_monitor | tail -5
 
 
 **Screenshot 4 — CLI command and supervisor response**
+
 <img width="1600" height="180" alt="WhatsApp Image 2026-04-17 at 10 47 29 PM" src="https://github.com/user-attachments/assets/1f28b9fa-13c2-47be-ab9c-2afc3a963990" />
 
 
 
 **Screenshot 5 — Soft limit warning in dmesg**
+
 <img width="1280" height="202" alt="screenshot5" src="https://github.com/user-attachments/assets/57fe6ed6-40ff-47b0-8d80-1eada3a0baa2" />
 
 
 **Screenshot 6 — Hard limit kill in dmesg**
+
 <img width="1280" height="202" alt="screenshot6" src="https://github.com/user-attachments/assets/689e1d3a-cd68-4265-8aa8-9dd52bb66fc0" />
 
 
@@ -135,6 +138,7 @@ dmesg | grep container_monitor | tail -5
 <img width="1280" height="401" alt="screenshot7 2" src="https://github.com/user-attachments/assets/52648142-97ff-4e49-ab26-09e2833bb0b9" />
 
 **Screenshot 8 — Clean teardown, no zombies**
+
 <img width="1280" height="202" alt="screenshot8" src="https://github.com/user-attachments/assets/174ec949-0832-4fb3-84b4-ce5d75daf131" />
 
 

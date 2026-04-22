@@ -228,8 +228,8 @@ Linux uses the Completely Fair Scheduler (CFS). CFS assigns each runnable proces
 
 | Container | Nice | Final Accumulator |
 |-----------|------|-------------------|
-| cpu_hi2   | 0    | 12,661,912,905,114,267,237 |
-| cpu_lo2   | 19   | 4,008,391,960,072,671,380  |
+| cpu_high  | 0    | 10650044571996614621 |
+| cpu_low   | 10   | 4407522595187936609  |
 
 cpu_hi2 completed approximately **3x more work** in the same 10 seconds. This matches the CFS weight ratio: weight(0)/weight(19) = 1024/15 ≈ 68. In practice the ratio is lower because other system processes also share the CPU, but the directional result is clear — higher nice value = less CPU share.
 
@@ -281,10 +281,10 @@ Both containers ran `/cpu_hog` for 10 seconds simultaneously.
 
 | Container | Nice value | CFS weight | Final accumulator |
 |-----------|-----------|------------|-------------------|
-| cpu_hi2   | 0         | 1024       | 12,661,912,905,114,267,237 |
-| cpu_lo2   | 19        | 15         | 4,008,391,960,072,671,380  |
+| cpu_high  | 0         | 1024       |  10650044571996614621 |
+| cpu_low   | 10        | 110        |  4407522595187936609  |
 
-**Ratio:** cpu_hi2 / cpu_lo2 ≈ 3.16x
+**Ratio:** cpu_high / cpu_low ≈ 2.4x
 
 **Analysis:** Linux CFS gave cpu_hi2 more CPU time proportional to its higher weight. The theoretical weight ratio is 1024/15 ≈ 68x, but the observed ratio is only ~3x because other processes (gnome-shell, Firefox) on the 4-core VM also competed for CPU, diluting the difference. The directional result confirms CFS fairness: higher priority = more CPU share.
 

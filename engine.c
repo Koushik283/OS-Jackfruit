@@ -577,4 +577,183 @@ static int run_supervisor(const char *rootfs) {
     sigaction(SIGTERM, &sa, NULL);
     
     rc = pthread_create(&ctx.logger_thread, NULL, logging_thread, &ctx.log_buffer);
-    if (rc != 0) { errno = rc; perror("pt
+    if (rc != 0) { errno = rc; perror("pthread_create"); return 1; }
+    
+    fprintf(stderr, "[supervisor] Started. Control socket: %s\n", CONTROL_PATH);
+    
+    while (!ctx.should_stop) {
+        int client_fd;
+        fd_set rfds;
+        struct timeval tv = {1, 0};
+        FD_ZERO(&rfds);
+        FD_SET(ctx.server_fd, &rfds);
+        int sel = select(ctx.server_fd + 1, &rfds, NULL, NULL, &tv);
+        if (sel < 0 && errno != EINTR) break;
+        if (sel <= 0) continue;
+        
+        client_fd = accept(ctx.server_fd, NULL, NULL);
+        if (client_fd < 0) {
+            if (errno == EINTR) continue;
+            perror("accept"); break;
+        }
+        handle_client(&ctx, client_fd);
+        close(client_fd);
+    }
+    
+    fprintf(stderr, "[supervisor] Shutting down...\n");
+    
+    pthread_mutex_lock(&ctx.metadata_lock);
+    container_record_t *c = ctx.containers;
+    while (c) {
+        if (c->state == CONTAINER_RUNNING) {
+            c->stop_requested = 1;
+            kill(c->host_pid, SIGTERM);
+        }
+        c = c->next;
+    }
+    pthread_mutex_unlock(&ctx.metadata_lock);
+    
+    sleep(1);
+    while (waitpid(-1, NULL, WNOHANG) > 0) {}
+    
+    bounded_buffer_begin_shutdown(&ctx.log_buffer);
+    pthread_join(ctx.logger_thread, NULL);
+    bounded_buffer_destroy(&ctx.log_buffer);
+    
+    pthread_mutex_lock(&ctx.metadata_lock);
+    c = ctx.containers;
+    while (c) {
+        container_record_t *next = c->next;
+        free(c);
+        c = next;
+    }
+    pthread_mutex_unlock(&ctx.metadata_lock);
+    pthread_mutex_destroy(&ctx.metadata_lock);
+    
+    if (ctx.monitor_fd >= 0) close(ctx.monitor_fd);
+    close(ctx.server_fd);
+    unlink(CONTROL_PATH);
+    
+    fprintf(stderr, "[supervisor] Clean exit.\n");
+    return 0;
+}
+
+static int send_control_request(const control_request_t *req) {
+    int sock;
+    struct sockaddr_un addr;
+    control_response_t resp;
+    
+    sock = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (sock < 0) { perror("socket"); return 1; }
+    
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, CONTROL_PATH, sizeof(addr.sun_path) - 1);
+    
+    if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        fprintf(stderr, "Cannot connect to supervisor. Is it running?\n");
+        close(sock); return 1;
+    }
+    
+    if (send(sock, req, sizeof(*req), 0) != (ssize_t)sizeof(*req)) {
+        perror("send"); close(sock); return 1;
+    }
+    
+    if (recv(sock, &resp, sizeof(resp), 0) == (ssize_t)sizeof(resp)) {
+        printf("%s\n", resp.message);
+        if (req->kind == CMD_LOGS) {
+            char buf[256];
+            ssize_t n;
+            while ((n = recv(sock, buf, sizeof(buf) - 1, 0)) > 0) {
+                buf[n] = '\0';
+                printf("%s", buf);
+            }
+        }
+    }
+    close(sock);
+    return resp.status == 0 ? 0 : 1;
+}
+
+static int cmd_start(int argc, char *argv[]) {
+    control_request_t req;
+    if (argc < 5) {
+        fprintf(stderr, "Usage: %s start <id> <container-rootfs> <command> [--soft-mib N] [--hard-mib N] [--nice N]\n", argv[0]);
+        return 1;
+    }
+    memset(&req, 0, sizeof(req));
+    req.kind = CMD_START;
+    strncpy(req.container_id, argv[2], sizeof(req.container_id) - 1);
+    strncpy(req.rootfs,       argv[3], sizeof(req.rootfs) - 1);
+    strncpy(req.command,      argv[4], sizeof(req.command) - 1);
+    req.soft_limit_bytes = DEFAULT_SOFT_LIMIT;
+    req.hard_limit_bytes = DEFAULT_HARD_LIMIT;
+    if (parse_optional_flags(&req, argc, argv, 5) != 0) return 1;
+    return send_control_request(&req);
+}
+
+static int cmd_run(int argc, char *argv[]) {
+    control_request_t req;
+    if (argc < 5) {
+        fprintf(stderr, "Usage: %s run <id> <container-rootfs> <command> [--soft-mib N] [--hard-mib N] [--nice N]\n", argv[0]);
+        return 1;
+    }
+    memset(&req, 0, sizeof(req));
+    req.kind = CMD_RUN;
+    strncpy(req.container_id, argv[2], sizeof(req.container_id) - 1);
+    strncpy(req.rootfs,       argv[3], sizeof(req.rootfs) - 1);
+    strncpy(req.command,      argv[4], sizeof(req.command) - 1);
+    req.soft_limit_bytes = DEFAULT_SOFT_LIMIT;
+    req.hard_limit_bytes = DEFAULT_HARD_LIMIT;
+    if (parse_optional_flags(&req, argc, argv, 5) != 0) return 1;
+    return send_control_request(&req);
+}
+
+static int cmd_ps(void) {
+    control_request_t req;
+    memset(&req, 0, sizeof(req));
+    req.kind = CMD_PS;
+    return send_control_request(&req);
+}
+
+static int cmd_logs(int argc, char *argv[]) {
+    control_request_t req;
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s logs <id>\n", argv[0]);
+        return 1;
+    }
+    memset(&req, 0, sizeof(req));
+    req.kind = CMD_LOGS;
+    strncpy(req.container_id, argv[2], sizeof(req.container_id) - 1);
+    return send_control_request(&req);
+}
+
+static int cmd_stop(int argc, char *argv[]) {
+    control_request_t req;
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s stop <id>\n", argv[0]);
+        return 1;
+    }
+    memset(&req, 0, sizeof(req));
+    req.kind = CMD_STOP;
+    strncpy(req.container_id, argv[2], sizeof(req.container_id) - 1);
+    return send_control_request(&req);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) { usage(argv[0]); return 1; }
+    if (strcmp(argv[1], "supervisor") == 0) {
+        if (argc < 3) {
+            fprintf(stderr, "Usage: %s supervisor <base-rootfs>\n", argv[0]);
+            return 1;
+        }
+        return run_supervisor(argv[2]);
+    }
+    if (strcmp(argv[1], "start") == 0) return cmd_start(argc, argv);
+    if (strcmp(argv[1], "run")   == 0) return cmd_run(argc, argv);
+    if (strcmp(argv[1], "ps")    == 0) return cmd_ps();
+    if (strcmp(argv[1], "logs")  == 0) return cmd_logs(argc, argv);
+    if (strcmp(argv[1], "stop")  == 0) return cmd_stop(argc, argv);
+    
+    usage(argv[0]);
+    return 1;
+}
